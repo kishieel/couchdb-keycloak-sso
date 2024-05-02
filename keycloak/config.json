@@ -1,0 +1,7 @@
+{
+  "realm" : "master",
+  "clients": [],
+  "attributes": {
+    "frontendUrl": "https://keycloak.oblivio.localhost"
+  }
+}
