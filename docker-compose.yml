@@ -14,6 +14,9 @@ services:
       KEYCLOAK_DATABASE_PASSWORD: "postgres"
       KEYCLOAK_DATABASE_NAME: "postgres"
       KEYCLOAK_DATABASE_PORT: "5432"
+      # KEYCLOAK_EXTRA_ARGS: "--hostname-url=https://keycloak.oblivio.localhost"
+      # PROXY_ADDRESS_FORWARDING: "true"
+      # KEYCLOAK_FRONTEND_URL: "https://keycloak.oblivio.localhost"
     depends_on:
       - "postgres"
     networks:
@@ -41,6 +44,10 @@ services:
     volumes:
       - "./nginx/certs:/opt/bitnami/nginx/conf/bitnami/certs:ro"
       - "./nginx/server_blocks:/opt/bitnami/nginx/conf/server_blocks:ro"
+    depends_on:
+      - "couchdb"
+      - "keycloak"
+      - "oauth2-proxy"
     networks:
       - "cks-network"
 
@@ -54,6 +61,18 @@ services:
       - "5432:5432"
     volumes:
       - "cks-postgres-data:/bitnami/postgresql"
+    networks:
+      - "cks-network"
+
+  redis:
+    image: "bitnami/redis:7.0.15"
+    environment:
+      REDIS_DATABASE: "redis"
+      REDIS_PASSWORD: "redis"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "cks-redis-data:/bitnami/redis/data"
     networks:
       - "cks-network"
 
@@ -73,27 +92,27 @@ services:
   oauth2-proxy:
     image: "bitnami/oauth2-proxy:7.6.0"
     environment:
-      OAUTH2_PROXY_EMAIL_DOMAINS: "oblivio.localhost"
+      OAUTH2_PROXY_HTTP_ADDRESS: "0.0.0.0:4180"
       OAUTH2_PROXY_COOKIE_SECRET: "OQINaROshtE9TcZkNAm-5Zs2Pv3xaWytBmc5W7sPX7w="
-      OAUTH2_PROXY_CLIENT_ID: "oauth2-proxy"
-      OAUTH2_PROXY_CLIENT_SECRET: "72341b6d-7065-4518-a0e4-50ee15025608"
+      OAUTH2_PROXY_EMAIL_DOMAINS: "oblivio.localhost"
+      OAUTH2_PROXY_COOKIE_SECURE: "false"
       OAUTH2_PROXY_UPSTREAMS: "https://couchdb.oblivio.localhost"
-      OAUTH2_PROXY_PROVIDER: "oidc"
+      OAUTH2_PROXY_COOKIE_DOMAINS: ".oblivio.localhost"
+      OAUTH2_PROXY_WHITELIST_DOMAINS: ".oblivio.localhost"
+      OAUTH2_PROXY_CLIENT_ID: "oauth2-proxy"
+      OAUTH2_PROXY_CLIENT_SECRET: "32scbZbgGNSaVOAAuZHgYeTjdQrkfwTh"
+#      OAUTH2_PROXY_LOGIN_URL: "https://keycloak.oblivio.localhost"
+      OAUTH2_PROXY_REDIRECT_URL: "https://couchdb.oblivio.localhost/oauth2/callback"
+      OAUTH2_PROXY_OIDC_ISSUER_URL: "http://keycloak:8080/realms/master"
+      OAUTH2_PROXY_PROVIDER: "keycloak-oidc"
       OAUTH2_PROXY_PROVIDER_DISPLAY_NAME: "Keycloak"
-      OAUTH2_PROXY_OIDC_ISSUER_URL: "http://keycloak:8080/auth/realms/master"
-#      OAUTH2_PROXY_http_address = "0.0.0.0:4180"
-#      OAUTH2_PROXY_cookie_secret = ""
-#      OAUTH2_PROXY_email_domains = "oblivio.localhost"
-#      OAUTH2_PROXY_cookie_secure = "false"
-#      OAUTH2_PROXY_upstreams = "https://couchdb.oblivio.localhost"
-#      OAUTH2_PROXY_cookie_domains = [".oblivio.localhost"]
-#      OAUTH2_PROXY_whitelist_domains = [".oblivio.localhost"]
-#      OAUTH2_PROXY_client_secret = "72341b6d-7065-4518-a0e4-50ee15025608"
-#      OAUTH2_PROXY_client_id = "oauth2-proxy"
-#      OAUTH2_PROXY_redirect_url = "https://oauth2-proxy.oblibio.localhost/oauth2/callback"
-#      OAUTH2_PROXY_oidc_issuer_url = "https://keycloak.oblibio.localhost/auth/realms/master"
-#      OAUTH2_PROXY_provider = "oidc"
-#      OAUTH2_PROXY_provider_display_name = "Keycloak"
+      OAUTH2_PROXY_CODE_CHALLENGE_METHOD: "S256"
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_INSECURE_OIDC_SKIP_ISSUER_VERIFICATION: "true" # @fixme
+      OAUTH2_PROXY_SESSION_STORE_TYPE: "redis"
+      OAUTH2_PROXY_REDIS_CONNECTION_URL: "redis://:redis@redis:6379"
+    depends_on:
+      - "keycloak"
     networks:
       - "cks-network"
 
@@ -105,4 +124,6 @@ volumes:
   cks-postgres-data:
     driver: "local"
   cks-couchdb-data:
+    driver: "local"
+  cks-redis-data:
     driver: "local"
