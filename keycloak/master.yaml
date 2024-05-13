@@ -1,0 +1,30 @@
+realm: "master"
+attributes:
+  frontendUrl: "https://auth.oblivio.localhost"
+roles:
+  realm:
+    - name: "couchdb:_admin"
+    - name: "couchdb:designer"
+    - name: "couchdb:consumer"
+  client:
+    oauth2-proxy:
+      - name: "oauth2-proxy"
+clients:
+  - clientId: "oauth2-proxy"
+    name: "OAuth2 Proxy"
+    clientAuthenticatorType: "client-secret"
+    secret: "32scbZbgGNSaVOAAuZHgYeTjdQrkfwTh"
+    redirectUris:
+      - "https://auth.oblivio.localhost/*"
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    protocolMappers:
+      - name: "aud-mapper-oauth2-proxy"
+        protocol: "openid-connect"
+        protocolMapper: "oidc-audience-mapper"
+        config:
+          included.client.audience: "oauth2-proxy"
+          id.token.claim: "true"
+          lightweight.claim: "false"
+          introspection.token.claim: "true"
+          access.token.claim: "true"
