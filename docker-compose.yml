@@ -61,18 +61,6 @@ services:
     networks:
       - "cks-network"
 
-  redis:
-    image: "bitnami/redis:7.0.15"
-    environment:
-      REDIS_DATABASE: "redis"
-      REDIS_PASSWORD: "redis"
-    ports:
-      - "6379:6379"
-    volumes:
-      - "cks-redis-data:/bitnami/redis/data"
-    networks:
-      - "cks-network"
-
   couchdb:
     image: "bitnami/couchdb:3.3.3"
     environment:
@@ -95,6 +83,4 @@ volumes:
   cks-postgres-data:
     driver: "local"
   cks-couchdb-data:
-    driver: "local"
-  cks-redis-data:
     driver: "local"
