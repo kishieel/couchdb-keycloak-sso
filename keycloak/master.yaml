@@ -1,30 +1,55 @@
 realm: "master"
 attributes:
   frontendUrl: "https://auth.oblivio.localhost"
-roles:
-  realm:
-    - name: "couchdb:_admin"
-    - name: "couchdb:designer"
-    - name: "couchdb:consumer"
-  client:
-    oauth2-proxy:
-      - name: "oauth2-proxy"
+groups:
+  - name: "couchdb"
+    path: "/couchdb"
+    subGroups:
+      - name: "admins"
+        path: "/couchdb/admins"
+        attributes:
+          _couchdb.roles:
+            - "_admin"
+      - name: "users"
+        path: "/couchdb/users"
+        attributes:
+          _couchdb.roles:
+            - "_user"
 clients:
-  - clientId: "oauth2-proxy"
-    name: "OAuth2 Proxy"
+  - clientId: "couchdb-cli"
+    name: "CouchDB CLI"
+    redirectUris:
+      - "http://localhost:8080"
+    standardFlowEnabled: "true"
+    directAccessGrantsEnabled: "false"
+    publicClient: "true"
+    optionalClientScopes:
+      - "couchdb"
+  - clientId: "couchdb-proxy"
+    name: "CouchDB Proxy"
+    publicClient: "false"
     clientAuthenticatorType: "client-secret"
     secret: "32scbZbgGNSaVOAAuZHgYeTjdQrkfwTh"
     redirectUris:
-      - "https://auth.oblivio.localhost/*"
-    standardFlowEnabled: true
-    directAccessGrantsEnabled: false
+      - "https://couchdb.oblivio.localhost/*"
+    standardFlowEnabled: "true"
+    directAccessGrantsEnabled: "false"
+    optionalClientScopes:
+      - "couchdb"
+clientScopes:
+  - name: "couchdb"
+    description: "CouchDB"
+    protocol: "openid-connect"
     protocolMappers:
-      - name: "aud-mapper-oauth2-proxy"
+      - name: "couchdb-roles"
         protocol: "openid-connect"
-        protocolMapper: "oidc-audience-mapper"
+        protocolMapper: "oidc-usermodel-attribute-mapper"
         config:
-          included.client.audience: "oauth2-proxy"
-          id.token.claim: "true"
-          lightweight.claim: "false"
-          introspection.token.claim: "true"
+          user.attribute: "_couchdb.roles"
+          claim.name: "_couchdb\\.roles"
+          jsonType.label: "String"
+          userinfo.token.claim: "true"
           access.token.claim: "true"
+          id.token.claim: "false"
+          multivalued: "true"
+          aggregate.attrs: "true"

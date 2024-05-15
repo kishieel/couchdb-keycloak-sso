@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+set -e
+
+ROOT_DIR="$(dirname "$0")/.."
+LIB_DIR="$ROOT_DIR/lib"
+
+show_help() {
+  cat << EOF | sed 's/^ \{4\}//'
+    cdb: A command-line tool for interacting with CouchDB instances securely using OIDC authentication.
+
+    Usage:
+      cdb <command> [options]
+
+    Commands:
+      auth   Authorizes the CLI to access the CouchDB instance securely using OIDC authentication.
+      curl   Wrapper around curl that securely communicates with the CouchDB instance using the obtained authentication token.
+
+    Examples:
+      cdb auth login
+      cdb curl -X GET http://localhost:5984/_all_dbs
+
+    For more information on a specific command, type 'cdb <command> --help'.
+EOF
+}
+
+case $1 in
+  auth | curl)
+    CMD="$1"
+    set -- "${@:2}"
+
+    # shellcheck source=../lib/auth.sh
+    # shellcheck source=../lib/curl.sh
+    source "$LIB_DIR/$CMD.sh"
+  ;;
+
+  help | --help | -h)
+    show_help
+  ;;
+
+  *)
+    if [ -n "$1" ]; then
+      echo -e "Unknown command: $1\n"
+    fi
+
+    show_help
+    exit 1
+  ;;
+esac
