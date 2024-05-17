@@ -30,7 +30,7 @@ if [ "${ACCESS_TOKEN_EXPIRES_AT}" -lt "${CURRENT_TIME}" ]; then
 
   GRANT_TYPE='refresh_token'
   CLIENT_ID='couchdb-cli'
-  SCOPE='openid+couchdb'
+  SCOPE='openid+couchdb+profile+email'
 
   CREDENTIALS=$(curl -s -X POST "${TOKEN_ENDPOINT}" -d "grant_type=${GRANT_TYPE}" -d "refresh_token=${REFRESH_TOKEN}" -d "client_id=${CLIENT_ID}" -d "scope=${SCOPE}")
   echo "${CREDENTIALS}" > "${HOME}/.config/cdb/credentials.json"

@@ -25,6 +25,8 @@ clients:
     publicClient: "true"
     optionalClientScopes:
       - "couchdb"
+      - "profile"
+      - "email"
   - clientId: "couchdb-proxy"
     name: "CouchDB Proxy"
     publicClient: "false"
@@ -36,6 +38,8 @@ clients:
     directAccessGrantsEnabled: "false"
     optionalClientScopes:
       - "couchdb"
+      - "profile"
+      - "email"
 clientScopes:
   - name: "couchdb"
     description: "CouchDB"
@@ -53,3 +57,15 @@ clientScopes:
           id.token.claim: "false"
           multivalued: "true"
           aggregate.attrs: "true"
+components:
+  org.keycloak.keys.KeyProvider:
+    - name: "rsa"
+      providerId: "rsa"
+      config:
+        active: ["true"]
+        enabled: ["true"]
+        priority: ["1000"]
+        algorithm: ["RS256"]
+        kid: ["xvAsHaF2w0M1y9GG6bmFannhp9aFLKvHQRaAAb8gUYc"]
+        privateKey: ["-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDM98i2/CFRiFYNlUtJ5ppUNyZUOa2+7SMnya3tzfrPOEVma6AJAMJ9YR2CL6SIkyz6q5RqnhQSXTzvPO9OasKuXLWtxpjVZRawCXoCciyaJTLe8qcmb6SOCOsjRSiGB1PaivJ/7NbCDiP6r8BxX4TXsYfdGW2EDBot+klxG6a+FObCA7KJ1bp/yPbgpP+mNyj7P8lG22E3USRjE3g8ag/J8b3UK+Azu1yBmdYAEPG1qz8q46tgF9qJiDo7QNDroRDLxoclypMsHJ3AIbJh5lquAl4uTALYMLI2foKJqXlc+JZ9tdTzxYg04R7SKuAcizdjZ2VccJNpGySGs5i8XguTAgMBAAECggEAOjpiQOmbpYfvumghPVtPmIEaWG8SVt0TUahPyvDrQZcg0BnfGu+mUOwX7/YM7eexrXy06x0BYr4uI2DSMxrNN6+KxVVX8beIHHZ0vOEmnpvWudOBfL/WpasO8bQh8QF/5uP2RDVKRVKzEfJ/3zVdjdEXYc5peEvf3BPwbTuHwRO4F69hgCZi8saBNXBinnOwQ8MSsUeA4RsC7+WcxygufBhNqjkqrYbpznkaZI5nrVdw7mb5E9KcOxbg0BUWnz141gPuUpu2O0iFiiAZoSlDtIwKCtdcvc2UJMYbXK9ORsIscRwP6b8T6O3Uhq1zkXQyjtLWbrfcpoNGGJ2udRFDEQKBgQD/UUVugyEOP98+S5e/2d2W+rk96HX7CKMQwj/ZA9NETugGAiD7fuUpbu3NzrAN7tsTXGOyArBEfdcXwjhvg52WhO9eOB/mcaiXEWVTk89ZrbcvZknDljKWM5zXOMvVZXAK6ci53jfVn5RLA2RIjK5mds1pLXIWgDHPrXFI7Nkb/wKBgQDNhA4/aaAyko8NiAWvk0hYZYQCFSH3YBl28lt90zzDjoZaQd/s8mpaRO4TY+KwFGBEznlFa28e1g0YzpZh13+V1ss4WT9NV/3tux2rblJWa2kmYbA/PeQDLHVfC/fq46T90uUW0wRIkc+nVTKG94Oo+tPUERjlmSJbzsjUDJLgbQKBgCXW9LRhSNfkzYBdEbuEXZwPwr6TIlE3QXutXmsabwhTrX2eeSbs8qfGYgY7mMon2V4wNjJexaMRB3zk8xpL5mI1h4huRwQPWk4xbNQLNxLydRDYVxxeuVabhaY8K7GP3CAx7+bkMWA+y2qmsQkzmHFlMCJjcuI0060U5pJJUBAfAoGALI30iMrdcBlV6hkTIn1Lsd5QQCNUucybuK3SJ/Ujt0Gu3uJpKXVkmS1Yb9u3yXShaklZATPJY2YEcNxYvd16S4HFjPHMR3hMFL38MK46K4IdybRkAVHpnMaGq5Rsqv+vRVfzUn9s7k6uNhjCW4BNitTWF6OdQilwyXaLE22magECgYAx1tGChvGQM3rYyJDA22ZNU4b+olc2bBJ0v45EX0unjGseuzPTKQRaGp8LqgByXcMuZqCCidsvlfrrz16hGHnsqPQFSV4ZL4D1pOKshmWhscLtF10FeC8z0QoJCNFaPuRkMCXyx+X+XjGsdfKRO/84z/7FfCI0t2QvvGWSnRpKUw==\n-----END PRIVATE KEY-----n"]
+        certificate: ["-----BEGIN CERTIFICATE-----\nMIIDhzCCAm+gAwIBAgIUVv9/pUd6omHb9BhGmfZb/jVPmz4wDQYJKoZIhvcNAQELBQAwUzELMAkGA1UEBhMCUEwxEzARBgNVBAgMClNvbWUtU3RhdGUxHTAbBgNVBAcMFEdyZWF0ZXIgUG9sYW5kV2Fyc2F3MRAwDgYDVQQKDAdPYmxpdmlvMB4XDTI0MDUxNzE0NTkxNloXDTI2MDUxNzE0NTkxNlowUzELMAkGA1UEBhMCUEwxEzARBgNVBAgMClNvbWUtU3RhdGUxHTAbBgNVBAcMFEdyZWF0ZXIgUG9sYW5kV2Fyc2F3MRAwDgYDVQQKDAdPYmxpdmlvMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzPfItvwhUYhWDZVLSeaaVDcmVDmtvu0jJ8mt7c36zzhFZmugCQDCfWEdgi+kiJMs+quUap4UEl087zzvTmrCrly1rcaY1WUWsAl6AnIsmiUy3vKnJm+kjgjrI0UohgdT2oryf+zWwg4j+q/AcV+E17GH3RlthAwaLfpJcRumvhTmwgOyidW6f8j24KT/pjco+z/JRtthN1EkYxN4PGoPyfG91CvgM7tcgZnWABDxtas/KuOrYBfaiYg6O0DQ66EQy8aHJcqTLBydwCGyYeZargJeLkwC2DCyNn6Cial5XPiWfbXU88WINOEe0irgHIs3Y2dlXHCTaRskhrOYvF4LkwIDAQABo1MwUTAdBgNVHQ4EFgQU9poNBVHTqAYUxc5c4naQhd2kOOswHwYDVR0jBBgwFoAU9poNBVHTqAYUxc5c4naQhd2kOOswDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEANcDxRDTyi1VLSjA4DFm/s0aSYSRtiGJoYxCSjxW+IthzMDmV6kuI7c/n+O5gIOTBQ2gCF9evbVbFcF/nYq4zKo5WvCfrZ8Hekvjdm5TOSKMRGWaoydOsVsRPlvNN2q+iVFzmymPixWRblLzbYG1T0lRn6tLn2BKH0qkNUUg68ljA8qYgvulYo5FzSLB1KgZRjDyyDS5+IT/vr/M2H/4h1eCPdD2JROfxf4+3OKBXg5N2Y6DJ/mwNqe+8WGOLmaPDV6GaBVR8BcryYBohrEwYwouhqvNYsk5c1wLBS+k4T1PHC53I/9oGrdhX9jDQiHvQ2CzTp5e9rscbVr71nv03ug==\n-----END CERTIFICATE-----\n"]

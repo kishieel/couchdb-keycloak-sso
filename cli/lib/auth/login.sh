@@ -22,7 +22,7 @@ login() {
   RESPONSE_TYPE='code'
   REDIRECT_URI='http://localhost:8080'
   CLIENT_ID='couchdb-cli'
-  SCOPE='openid+couchdb'
+  SCOPE='openid+couchdb+profile+email'
 
   STATE=$(head -c 16 /dev/urandom | openssl enc -base64 | tr -dc 'a-zA-Z0-9')
   CODE_VERIFIER=$(openssl rand -base64 60 | tr -d '\n' | tr '/+' '_-' | tr -d '=')
