@@ -9,11 +9,11 @@ local opts = {
     discovery = {
         issuer = "https://auth.oblivio.localhost/realms/master",
         authorization_endpoint = "https://auth.oblivio.localhost/realms/master/protocol/openid-connect/auth",
+        end_session_endpoint = "https://auth.oblivio.localhost/realms/master/protocol/openid-connect/logout",
         token_endpoint = "http://keycloak:8080/realms/master/protocol/openid-connect/token",
         jwks_uri = "http://keycloak:8080/realms/master/protocol/openid-connect/certs",
         userinfo_endpoint = "http://keycloak:8080/realms/master/protocol/openid-connect/userinfo",
         revocation_endpoint = "http://keycloak:8080/realms/master/protocol/openid-connect/revoke",
-        end_session_endpoint = "https://auth.oblivio.localhost/realms/master/protocol/openid-connect/logout",
         introspection_endpoint = "http://keycloak:8080/realms/master/protocol/openid-connect/token/introspect"
     },
     client_id = "couchdb-proxy",

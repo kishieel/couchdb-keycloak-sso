@@ -1,7 +1,5 @@
-##### Todo
+# CouchDB Single Sign-On
 
-I think I should consider here three different scenarios for the authentication:
+Protecting CouchDB instance with Single Sign-On mechanisms implemented with Keycloak, Lua and Nginx in Docker network.
 
-- [X] Authentication to Fauxton (CouchDB GUI)
-- [ ] Authentication for CouchDB Standalone Application
-- [X] Shell authentication with web browser
+See the article on [Medium](https://medium.com/@kishieel/securing-couchdb-with-keycloak-behind-nginx-reverse-proxy-part-1-74b84ab016bf) for detailed explanation.
