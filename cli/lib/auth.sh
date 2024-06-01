@@ -1,11 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -e -o pipefail
+source "$LIB_DIR/utils/oidc.sh"
 
-ROOT_DIR="$(dirname "$0")/.."
-LIB_DIR="$ROOT_DIR/lib"
-
-show_help() {
+help() {
   cat << EOF | sed 's/^ \{4\}//'
     cdb auth: A command-line tool for authorizing users to access a CouchDB instance.
 
@@ -15,6 +13,10 @@ show_help() {
     Commands:
       login   Initiates the authorization process for CLI access to the CouchDB instance.
       logout  Terminates the current session, revoking CLI access to the CouchDB instance.
+      help    Displays this help message.
+
+    Options:
+      --help, -h  Displays this help message.
 
     Examples:
       cdb auth login
@@ -24,26 +26,17 @@ show_help() {
 EOF
 }
 
-case $1 in
-  login | logout)
-    cmd="$1"
-    set -- "${@:2}"
+main() {
+  case $1 in
+    login) shift; source "$LIB_DIR/auth/login.sh";;
+    logout) shift; source "$LIB_DIR/auth/logout.sh";;
+    help | --help | -h) help;;
+    *)
+      if [ -n "$1" ]; then echo -e "Unknown command: $1\n"; fi
+      help
+      exit 1
+    ;;
+  esac
+}
 
-    # shellcheck source=../auth/login.sh
-    # shellcheck source=../auth/logout.sh
-    source "$LIB_DIR/auth/$cmd.sh"
-  ;;
-
-  help | --help | -h)
-    show_help
-  ;;
-
-  *)
-    if [ -n "$1" ]; then
-      echo -e "Unknown command: $1\n"
-    fi
-
-    show_help
-    exit 1
-  ;;
-esac
+main "$@"

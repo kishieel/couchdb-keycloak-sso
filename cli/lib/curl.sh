@@ -1,42 +1,37 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -e -o pipefail
+source "$LIB_DIR/utils/oidc.sh"
 
-if [ ! -f "$HOME/.config/cdb/credentials.json" ]; then
-  echo "No credentials found. Please authenticate first."
-  exit 1
-fi
+main() {
+  check_credentials
 
-CREDENTIALS=$(cat "$HOME/.config/cdb/credentials.json")
-ACCESS_TOKEN=$(echo "${CREDENTIALS}" | jq -r '.access_token')
-TOKEN_TYPE=$(echo "${CREDENTIALS}" | jq -r '.token_type')
+  local access_token; access_token=$(get_access_token)
+  local token_type; token_type=$(get_token_type)
+  local decoded_access_token; decoded_access_token=$(decode_access_token "$access_token")
+  local access_token_expires_at; access_token_expires_at=$(get_access_token_expires_at "$decoded_access_token")
+  local current_time; current_time=$(date +%s)
 
-DECODED_ACCESS_TOKEN=$(echo "${ACCESS_TOKEN}" | cut -d "." -f2 | sed 's/$/====/' | fold -w 4 | sed '$ d' | tr -d '\n' | openssl enc -base64 -d -A)
-ACCESS_TOKEN_EXPIRES_AT=$(echo "${DECODED_ACCESS_TOKEN}" | jq -r '.exp')
-CURRENT_TIME=$(date +%s)
+  if [ "${access_token_expires_at}" -lt "${current_time}" ]; then
+    local refresh_token; refresh_token=$(get_refresh_token)
+    local decoded_refresh_token; decoded_refresh_token=$(decode_refresh_token "$refresh_token")
+    local refresh_token_expires_at; refresh_token_expires_at=$(get_refresh_token_expires_at "$decoded_refresh_token")
 
-if [ "${ACCESS_TOKEN_EXPIRES_AT}" -lt "${CURRENT_TIME}" ]; then
-  REFRESH_TOKEN=$(echo "${CREDENTIALS}" | jq -r '.refresh_token')
-  DECODED_REFRESH_TOKEN=$(echo "${REFRESH_TOKEN}" | cut -d "." -f2 | sed 's/$/====/' | fold -w 4 | sed '$ d' | tr -d '\n' | openssl enc -base64 -d -A)
-  REFRESH_TOKEN_EXPIRES_AT=$(echo "${DECODED_REFRESH_TOKEN}" | jq -r '.exp')
+    if [ "${refresh_token_expires_at}" -lt "${current_time}" ]; then
+      echo "Your session has expired. Please re-authenticate."
+      exit 1
+    fi
 
-  if [ "${REFRESH_TOKEN_EXPIRES_AT}" -lt "${CURRENT_TIME}" ]; then
-    echo "Your session has expired. Please re-authenticate."
-    exit 1
+    local oidc_config; oidc_config=$(get_oidc_config)
+    local token_endpoint; token_endpoint=$(get_token_endpoint "$oidc_config")
+
+    refresh_access_token "$token_endpoint" "$refresh_token"
+
+    access_token=$(get_access_token)
+    token_type=$(get_token_type)
   fi
 
-  OIDC_CONFIG=$(curl -s 'https://auth.oblivio.localhost/realms/master/.well-known/openid-configuration')
-  TOKEN_ENDPOINT=$(echo "$OIDC_CONFIG" | jq -r '.token_endpoint')
+  curl "$@" -H "Authorization: ${token_type} ${access_token}"
+}
 
-  GRANT_TYPE='refresh_token'
-  CLIENT_ID='couchdb-cli'
-  SCOPE='openid+couchdb+profile+email'
-
-  CREDENTIALS=$(curl -s -X POST "${TOKEN_ENDPOINT}" -d "grant_type=${GRANT_TYPE}" -d "refresh_token=${REFRESH_TOKEN}" -d "client_id=${CLIENT_ID}" -d "scope=${SCOPE}")
-  echo "${CREDENTIALS}" > "${HOME}/.config/cdb/credentials.json"
-
-  ACCESS_TOKEN=$(echo "${CREDENTIALS}" | jq -r '.access_token')
-  TOKEN_TYPE=$(echo "${CREDENTIALS}" | jq -r '.token_type')
-fi
-
-curl "$@" -H "Authorization: ${TOKEN_TYPE} ${ACCESS_TOKEN}"
+main "$@"
